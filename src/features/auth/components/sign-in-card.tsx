@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react"
+import { useState } from "react"
 
 import { FaGithub } from "react-icons/fa"
 
@@ -18,14 +18,32 @@ export const SignInCard = ({ setState }: SignInCardProps) => {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [error, setError] = useState("")
+    const [pending, setPending] = useState(false)
 
-    const handleProviderSignIn = (value: "github") => {
+    const onProviderSignIn = (value: "github") => {
+        setError("")
+        setPending(true)
         signIn(value)
+            .catch(() => {
+                setError("Something went wrong")
+            })
+            .finally(() => {
+                setPending(false)
+            })
     }
 
-    const handleEmailSignIn = (e: FormEvent<HTMLFormElement>) => {
+    const onPasswordSignIn = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setError("")
+        setPending(true)
         signIn("password", { email, password, flow: "signIn" })
+            .catch(() => {
+                setError("Invalid email or password")
+            })
+            .finally(() => {
+                setPending(false)
+            })
     }
 
 
@@ -40,9 +58,9 @@ export const SignInCard = ({ setState }: SignInCardProps) => {
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5 px-0 pb-0">
-                <form className="space-y-2.5" onSubmit={handleEmailSignIn}>
+                <form className="space-y-2.5" onSubmit={onPasswordSignIn}>
                     <Input
-                        disabled={false}
+                        disabled={pending}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Email"
@@ -50,22 +68,23 @@ export const SignInCard = ({ setState }: SignInCardProps) => {
                         required
                     />
                     <Input
-                        disabled={false}
+                        disabled={pending}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Password"
                         type="password"
                         required
                     />
-                    <Button type="submit" className="w-full" size="lg" disabled={false}>
-                        Continue
+                    <Button type="submit" className="w-full" size="lg" disabled={pending}>
+                        {pending ? "Loading..." : "Continue"}
                     </Button>
+                    {error && <p className="text-xs text-destructive">{error}</p>}
                 </form>
                 <Separator />
                 <div className="flex flex-col gap-y-2.5">
                     <Button
-                    disabled={false}
-                    onClick={() => handleProviderSignIn("github")}
+                    disabled={pending}
+                    onClick={() => onProviderSignIn("github")}
                     variant="outline"
                     size="lg"
                     className="w-full relative"
