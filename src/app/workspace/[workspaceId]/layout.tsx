@@ -1,7 +1,14 @@
 "use client"
 
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+
 import { Toolbar } from "./toolbar";
 import { Sidebar } from "./sidebar";
+import { WorkspaceSidebar } from "./workspace-sidebar";
 
 interface WorkspaceIdLayoutProps {
     children: React.ReactNode;
@@ -12,8 +19,24 @@ const WorkspaceIdLayout = ({ children }: WorkspaceIdLayoutProps) => {
     <div className="h-full">
       <Toolbar /> 
       <div className="flex h-[calc(100vh-40px)]">
-      <Sidebar />   
-      {children}
+      <Sidebar />
+      <ResizablePanelGroup
+        direction="horizontal"
+        autoSave="mm-workspace-layout"
+        className="h-full"
+      >
+        <ResizablePanel
+        defaultSize={22}
+        minSize={16}
+        className="bg-[#5E2C5F]"
+        >
+          <WorkspaceSidebar />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={78} minSize={20}>
+          {children}
+        </ResizablePanel>   
+      </ResizablePanelGroup>   
       </div>
     </div>
   )
